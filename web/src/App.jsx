@@ -135,7 +135,7 @@ export default function App() {
         }
 
         clearTimeout(translateTimer)
-        translateTimer = setTimeout(() => doTranslate(interimSource), 300)
+        translateTimer = setTimeout(() => doTranslate(interimSource), 150)
       }
     }
 
