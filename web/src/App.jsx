@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useRef, useCallback, useEffect, useLayoutEffect } from 'react'
 
 const LANGUAGES = [
   { code: 'en-US', name: 'English', flag: '🇬🇧' },
@@ -60,12 +60,14 @@ export default function App() {
   const silenceRef = useRef(null)
 
   const scrollDown = () => {
-    if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight
+    const el = listRef.current
+    if (el) requestAnimationFrame(() => { el.scrollTop = el.scrollHeight })
   }
 
+  useLayoutEffect(() => { scrollDown() })
   useEffect(() => { scrollDown() }, [history])
   useEffect(() => {
-    const t = setInterval(scrollDown, 300)
+    const t = setInterval(scrollDown, 200)
     return () => clearInterval(t)
   }, [])
 
@@ -207,6 +209,7 @@ export default function App() {
         body{background:#0d0d0d;color:#f0f0f0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
         @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+        html,body,#root{height:100%;overflow:hidden}
         .card{background:${CARD_BG};border-radius:14px;padding:18px;margin-bottom:14px;border:1px solid ${BORDER}}
         .src{color:#fff;font-size:17px;font-weight:500;line-height:1.5;margin-bottom:8px;word-break:break-word}
         .th{color:${GREEN};font-size:21px;font-weight:700;line-height:1.5;word-break:break-word}
