@@ -19,6 +19,27 @@ const TEXT = '#f0f0f0'
 const TEXT_DIM = '#b0b0b0'
 const GREEN = '#4ade80'
 
+const cache = new Map()
+async function translateText(text, srcLang) {
+  const key = srcLang + '|' + text
+  if (cache.has(key)) return cache.get(key)
+  const langCode = srcLang.split('-')[0]
+  try {
+    const ctrl = new AbortController()
+    const timer = setTimeout(() => ctrl.abort(), 3000)
+    const res = await fetch(
+      `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${langCode}&tl=th&dt=t&q=${encodeURIComponent(text)}`,
+      { signal: ctrl.signal }
+    )
+    clearTimeout(timer)
+    const data = await res.json()
+    const result = data[0].map(s => s[0]).join('')
+    if (cache.size > 200) cache.clear()
+    cache.set(key, result)
+    return result
+  } catch { return text }
+}
+
 const css = `
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: #0d0d0d; color: #f0f0f0; font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
@@ -37,23 +58,11 @@ export default function App() {
   const [error, setError] = useState('')
   const recognitionRef = useRef(null)
   const historyEndRef = useRef(null)
+  const pendingRef = useRef([])
 
   useEffect(() => {
     historyEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [history])
-
-  const translate = async (text, srcLang) => {
-    const langCode = srcLang.split('-')[0]
-    try {
-      const res = await fetch(
-        `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${langCode}&tl=th&dt=t&q=${encodeURIComponent(text)}`
-      )
-      const data = await res.json()
-      return data[0].map(s => s[0]).join('')
-    } catch {
-      return text
-    }
-  }
 
   const startListening = useCallback(() => {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
@@ -70,23 +79,31 @@ export default function App() {
 
     recognition.onresult = async (event) => {
       let interimText = ''
+      const finals = []
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const transcript = event.results[i][0].transcript
         if (event.results[i].isFinal) {
-          const translated = await translate(transcript, selectedLang.code)
+          finals.push(transcript)
           setHistory(prev => [...prev, {
             id: Date.now() + Math.random(),
             source: transcript,
-            translated,
+            translated: '...',
             time: new Date().toLocaleTimeString('th-TH'),
             lang: selectedLang,
           }])
-          setInterim('')
         } else {
           interimText += transcript
         }
       }
       if (interimText) setInterim(interimText)
+
+      for (const text of finals) {
+        const translated = await translateText(text, selectedLang.code)
+        setHistory(prev => prev.map((item, i) =>
+          i === prev.length - 1 ? { ...item, translated } : item
+        ))
+      }
+      if (finals.length) setInterim('')
     }
 
     recognition.onerror = (e) => { if (e.error !== 'no-speech') setError(`Error: ${e.error}`) }
