@@ -38,8 +38,6 @@ export default function App() {
   const boxRef = useRef(null)
   const recogRef = useRef(null)
   const idRef = useRef(0)
-  const bufRef = useRef('')
-  const timerRef = useRef(null)
 
   const [flash, setFlash] = useState(false)
 
@@ -55,18 +53,22 @@ export default function App() {
   }
   const updCard = (id, th) => setCards(p => p.map(c => c.id === id ? { ...c, th } : c))
 
-  const flushBuffer = useCallback(() => {
-    const text = bufRef.current.trim()
-    bufRef.current = ''
-    if (!text || text.length < 2) return
+  const activeCardRef = useRef(null)
+  const transTimerRef = useRef(null)
 
-    const id = addCard(text, lang.flag)
+  const createCard = (src, flag) => {
+    const id = ++idRef.current
+    setCards(p => [...p, { id, src, th: '...', flag }])
+    return id
+  }
+  const updateCard = (id, patch) => setCards(p => p.map(c => c.id === id ? { ...c, ...patch } : c))
+
+  const doTranslate = (id, text) => {
     translate(text, lang.code).then(t => {
-      updCard(id, t)
+      updateCard(id, { th: t })
       doFlash()
-      scroll()
     })
-  }, [lang])
+  }
 
   const start = useCallback(() => {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) return
@@ -83,31 +85,40 @@ export default function App() {
       for (let i = ev.resultIndex; i < ev.results.length; i++) {
         const txt = ev.results[i][0].transcript
         if (ev.results[i].isFinal) {
-          bufRef.current += txt + ' '
-          clearTimeout(timerRef.current)
-          timerRef.current = setTimeout(flushBuffer, 800)
+          if (!activeCardRef.current) {
+            activeCardRef.current = createCard(txt, lang.flag)
+          } else {
+            updateCard(activeCardRef.current, { src: txt })
+          }
+          doTranslate(activeCardRef.current, txt)
+          activeCardRef.current = null
+        } else {
+          if (!activeCardRef.current) {
+            activeCardRef.current = createCard(txt, lang.flag)
+          } else {
+            updateCard(activeCardRef.current, { src: txt })
+          }
+          clearTimeout(transTimerRef.current)
+          const cardId = activeCardRef.current
+          transTimerRef.current = setTimeout(() => doTranslate(cardId, txt), 200)
         }
       }
+      scroll()
     }
 
     r.onerror = () => {}
-    r.onend = () => {
-      if (isOn) {
-        flushBuffer()
-        try { r.start() } catch {}
-      }
-    }
+    r.onend = () => { if (isOn) try { r.start() } catch {} }
 
     recogRef.current = r
     r.start()
-  }, [lang, isOn, flushBuffer])
+  }, [lang, isOn])
 
   const stop = useCallback(() => {
     setIsOn(false)
-    clearTimeout(timerRef.current)
-    flushBuffer()
+    clearTimeout(transTimerRef.current)
+    activeCardRef.current = null
     if (recogRef.current) { recogRef.current.stop(); recogRef.current = null }
-  }, [flushBuffer])
+  }, [])
 
   if (page === 'select') {
     return (
