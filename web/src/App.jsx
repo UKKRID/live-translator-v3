@@ -60,7 +60,9 @@ export default function App() {
   const silenceRef = useRef(null)
 
   useEffect(() => {
-    if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight
+    if (listRef.current) {
+      listRef.current.scrollTop = listRef.current.scrollHeight
+    }
   }, [history])
 
   const addCard = (source, time, flag) => {
@@ -195,7 +197,7 @@ export default function App() {
         </button>
       </header>
 
-      <main ref={listRef} style={{ flex: 1, overflowY: 'auto', padding: '24px', maxWidth: '720px', margin: '0 auto', width: '100%' }}>
+      <main ref={listRef} style={{ flex: 1, overflowY: 'auto', padding: '24px', maxWidth: '720px', margin: '0 auto', width: '100%', height: 0, minHeight: 0 }}>
         {!isOn && history.length === 0 && (
           <div style={{ textAlign: 'center', marginTop: '100px' }}>
             <div style={{ fontSize: '72px', marginBottom: '20px' }}>🎙️</div>
