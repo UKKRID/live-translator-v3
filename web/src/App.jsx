@@ -87,13 +87,13 @@ export default function App() {
 
     let interimCardId = null
     let interimSource = ''
+    let lastTranslatedText = ''
     let translateTimer = null
 
-    const doTranslate = (text) => {
+    const doTranslate = (text, cardId) => {
       fastTranslate(text, lang.code).then(t => {
-        if (interimRef.current) {
-          const thEl = interimRef.current.querySelector('.th')
-          if (thEl) thEl.textContent = '🇹🇭 ' + t
+        if (cardId === interimCardId) {
+          setHistory(prev => prev.map(item => item.id === cardId ? { ...item, translated: t } : item))
         }
       })
     }
@@ -104,19 +104,16 @@ export default function App() {
         const res = event.results[i]
         const text = res[0].transcript
         if (res.isFinal) {
-          if (interimCardId) {
-            const id = interimCardId
-            const src = interimSource
-            interimCardId = null
-            interimSource = ''
-            doTranslate(src).then(t => updateCard(id, t))
-          } else {
+          const finalId = interimCardId || (() => {
             const now = new Date().toLocaleTimeString('th-TH')
-            const id = addCard(text, now, lang.flag)
-            fastTranslate(text, lang.code).then(t => updateCard(id, t))
-          }
+            return addCard(text, now, lang.flag)
+          })()
+          interimCardId = null
+          interimSource = ''
+          lastTranslatedText = ''
+          clearTimeout(translateTimer)
+          doTranslate(text, finalId)
           lastFinalTime = Date.now()
-          if (interimRef.current) interimRef.current.style.display = 'none'
         } else {
           interimText += text
           lastInterimText = text
@@ -128,14 +125,18 @@ export default function App() {
           const now = new Date().toLocaleTimeString('th-TH')
           interimCardId = addCard(interimText, now, lang.flag)
           interimSource = interimText
-          if (interimRef.current) interimRef.current.style.display = 'none'
         } else {
           setHistory(prev => prev.map(item => item.id === interimCardId ? { ...item, source: interimText } : item))
           interimSource = interimText
         }
 
-        clearTimeout(translateTimer)
-        translateTimer = setTimeout(() => doTranslate(interimSource), 150)
+        if (interimText !== lastTranslatedText) {
+          clearTimeout(translateTimer)
+          translateTimer = setTimeout(() => {
+            lastTranslatedText = interimText
+            doTranslate(interimText, interimCardId)
+          }, 100)
+        }
       }
     }
 
