@@ -40,7 +40,6 @@ export default function App() {
   const idRef = useRef(0)
   const bufRef = useRef('')
   const timerRef = useRef(null)
-  const processingRef = useRef(false)
 
   const [flash, setFlash] = useState(false)
 
@@ -59,14 +58,11 @@ export default function App() {
   const flushBuffer = useCallback(() => {
     const text = bufRef.current.trim()
     bufRef.current = ''
-    if (!text || text.length < 2 || processingRef.current) return
+    if (!text || text.length < 2) return
 
-    processingRef.current = true
     const id = addCard(text, lang.flag)
-
     translate(text, lang.code).then(t => {
       updCard(id, t)
-      processingRef.current = false
       scroll()
     })
   }, [lang])
@@ -83,19 +79,14 @@ export default function App() {
     r.onstart = () => setIsOn(true)
 
     r.onresult = (ev) => {
-      let hasFinal = false
       for (let i = ev.resultIndex; i < ev.results.length; i++) {
         const txt = ev.results[i][0].transcript
         if (ev.results[i].isFinal) {
           bufRef.current += txt + ' '
-          hasFinal = true
+          clearTimeout(timerRef.current)
+          timerRef.current = setTimeout(flushBuffer, 800)
         }
       }
-
-      clearTimeout(timerRef.current)
-      timerRef.current = setTimeout(() => {
-        flushBuffer()
-      }, hasFinal ? 1500 : 3000)
     }
 
     r.onerror = () => {}
