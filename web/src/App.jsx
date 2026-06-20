@@ -85,24 +85,57 @@ export default function App() {
 
     r.onstart = () => setIsOn(true)
 
+    let interimCardId = null
+    let interimSource = ''
+    let translateTimer = null
+
+    const doTranslate = (text) => {
+      fastTranslate(text, lang.code).then(t => {
+        if (interimRef.current) {
+          const thEl = interimRef.current.querySelector('.th')
+          if (thEl) thEl.textContent = '🇹🇭 ' + t
+        }
+      })
+    }
+
     r.onresult = (event) => {
       let interimText = ''
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const res = event.results[i]
         const text = res[0].transcript
         if (res.isFinal) {
-          const now = new Date().toLocaleTimeString('th-TH')
-          const id = addCard(text, now, lang.flag)
-          fastTranslate(text, lang.code).then(t => updateCard(id, t))
+          if (interimCardId) {
+            const id = interimCardId
+            const src = interimSource
+            interimCardId = null
+            interimSource = ''
+            doTranslate(src).then(t => updateCard(id, t))
+          } else {
+            const now = new Date().toLocaleTimeString('th-TH')
+            const id = addCard(text, now, lang.flag)
+            fastTranslate(text, lang.code).then(t => updateCard(id, t))
+          }
           lastFinalTime = Date.now()
+          if (interimRef.current) interimRef.current.style.display = 'none'
         } else {
           interimText += text
           lastInterimText = text
         }
       }
-      if (interimRef.current) {
-        interimRef.current.textContent = interimText
-        interimRef.current.style.display = interimText ? 'block' : 'none'
+
+      if (interimText) {
+        if (!interimCardId) {
+          const now = new Date().toLocaleTimeString('th-TH')
+          interimCardId = addCard(interimText, now, lang.flag)
+          interimSource = interimText
+          if (interimRef.current) interimRef.current.style.display = 'none'
+        } else {
+          setHistory(prev => prev.map(item => item.id === interimCardId ? { ...item, source: interimText } : item))
+          interimSource = interimText
+        }
+
+        clearTimeout(translateTimer)
+        translateTimer = setTimeout(() => doTranslate(interimSource), 300)
       }
     }
 
@@ -113,27 +146,7 @@ export default function App() {
     let lastInterimText = ''
     let lastInterimLen = 0
 
-    silenceRef.current = setInterval(() => {
-      if (!isOn) return
-      const now = Date.now()
-      const len = lastInterimText ? lastInterimText.length : 0
-
-      if (len > 80 || (len > 15 && now - lastFinalTime > 1200) || (len > 5 && now - lastFinalTime > 2000)) {
-        const text = lastInterimText
-        if (text.length > 2) {
-          const ts = new Date().toLocaleTimeString('th-TH')
-          const id = addCard(text, ts, lang.flag)
-          fastTranslate(text, lang.code).then(t => updateCard(id, t))
-          lastFinalTime = now
-          lastInterimText = ''
-          lastInterimLen = 0
-          if (interimRef.current) interimRef.current.style.display = 'none'
-        }
-      }
-
-      if (!lastInterimText || lastInterimText.length === lastInterimLen) return
-      lastInterimLen = lastInterimText.length
-    }, 200)
+    silenceRef.current = setInterval(() => {}, 10000)
 
     recogRef.current = r
     r.start()
