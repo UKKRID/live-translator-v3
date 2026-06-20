@@ -72,7 +72,13 @@ export default function App() {
       for (let i = ev.resultIndex; i < ev.results.length; i++) {
         const txt = ev.results[i][0].transcript
         if (ev.results[i].isFinal) {
-          if (!splitDone) {
+          if (splitDone) {
+            const remain = txt.slice(60)
+            if (remain.length > 2) {
+              const id = addCard(remain, lang.flag)
+              translate(remain, lang.code).then(t => { updCard(id, t); doFlash() })
+            }
+          } else {
             const id = addCard(txt, lang.flag)
             translate(txt, lang.code).then(t => { updCard(id, t); doFlash() })
           }
