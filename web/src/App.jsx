@@ -113,13 +113,14 @@ export default function App() {
 
     silenceRef.current = setInterval(() => {
       if (!isOn) return
-      if (lastInterimText && lastInterimText.length > lastInterimLen && Date.now() - lastFinalTime > 800) {
+      const now = Date.now()
+      if (lastInterimText && lastInterimText.length > lastInterimLen && now - lastFinalTime > 500) {
         const text = lastInterimText
-        if (text.length > 2) {
-          const now = new Date().toLocaleTimeString('th-TH')
-          const id = addCard(text, now, lang.flag)
+        if (text.length > 15 || text.split(' ').length >= 3 || (now - lastFinalTime > 2000)) {
+          const ts = new Date().toLocaleTimeString('th-TH')
+          const id = addCard(text, ts, lang.flag)
           fastTranslate(text, lang.code).then(t => updateCard(id, t))
-          lastFinalTime = Date.now()
+          lastFinalTime = now
           lastInterimText = ''
           lastInterimLen = 0
           if (interimRef.current) interimRef.current.style.display = 'none'
@@ -127,7 +128,7 @@ export default function App() {
       }
       if (!lastInterimText || lastInterimText.length === lastInterimLen) return
       lastInterimLen = lastInterimText.length
-    }, 300)
+    }, 200)
 
     recogRef.current = r
     r.start()
