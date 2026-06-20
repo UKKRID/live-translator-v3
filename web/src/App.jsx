@@ -13,6 +13,199 @@ const LANGUAGES = [
   { code: 'ar-SA', name: 'Arabic', flag: '🇸🇦' },
 ]
 
+const styles = {
+  body: {
+    minHeight: '100vh',
+    background: '#0a0a0a',
+    color: '#ffffff',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    margin: 0,
+    padding: 0,
+  },
+  header: {
+    background: '#111111',
+    borderBottom: '1px solid #222',
+    padding: '16px 20px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    position: 'sticky',
+    top: 0,
+    zIndex: 100,
+  },
+  backBtn: {
+    color: '#888',
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    fontSize: '14px',
+  },
+  langInfo: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+  },
+  langFlag: {
+    fontSize: '24px',
+  },
+  langText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: '16px',
+  },
+  startBtn: {
+    padding: '10px 24px',
+    borderRadius: '24px',
+    border: 'none',
+    fontWeight: 'bold',
+    fontSize: '14px',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+  },
+  startBtnActive: {
+    background: '#dc2626',
+    color: '#fff',
+    animation: 'pulse 1.5s infinite',
+  },
+  startBtnInactive: {
+    background: '#16a34a',
+    color: '#fff',
+  },
+  error: {
+    background: 'rgba(220, 38, 38, 0.15)',
+    color: '#fca5a5',
+    padding: '12px',
+    textAlign: 'center',
+    fontSize: '14px',
+  },
+  main: {
+    flex: 1,
+    overflowY: 'auto',
+    padding: '20px',
+    maxWidth: '700px',
+    margin: '0 auto',
+    width: '100%',
+    boxSizing: 'border-box',
+  },
+  emptyState: {
+    textAlign: 'center',
+    color: '#555',
+    marginTop: '80px',
+  },
+  emptyIcon: {
+    fontSize: '64px',
+    marginBottom: '16px',
+  },
+  emptyText: {
+    fontSize: '16px',
+    color: '#666',
+  },
+  emptySubtext: {
+    fontSize: '13px',
+    color: '#444',
+    marginTop: '8px',
+  },
+  card: {
+    background: '#161616',
+    borderRadius: '12px',
+    padding: '16px',
+    marginBottom: '12px',
+    border: '1px solid #222',
+  },
+  cardMeta: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    marginBottom: '8px',
+    fontSize: '12px',
+    color: '#555',
+  },
+  cardSource: {
+    color: '#ccc',
+    fontSize: '15px',
+    lineHeight: 1.5,
+    marginBottom: '8px',
+    wordBreak: 'break-word',
+  },
+  cardTranslated: {
+    color: '#4ade80',
+    fontSize: '18px',
+    lineHeight: 1.5,
+    wordBreak: 'break-word',
+  },
+  interimCard: {
+    background: '#1a1a1a',
+    borderRadius: '12px',
+    padding: '16px',
+    marginBottom: '12px',
+    border: '1px solid #333',
+    opacity: 0.6,
+  },
+  interimLabel: {
+    color: '#555',
+    fontSize: '12px',
+    marginBottom: '6px',
+  },
+  interimText: {
+    color: '#999',
+    fontSize: '15px',
+  },
+  footer: {
+    background: '#111111',
+    borderTop: '1px solid #222',
+    padding: '12px',
+    textAlign: 'center',
+  },
+  footerDot: {
+    display: 'inline-block',
+    width: '10px',
+    height: '10px',
+    background: '#22c55e',
+    borderRadius: '50%',
+    marginRight: '8px',
+    animation: 'pulse 1.5s infinite',
+  },
+  footerText: {
+    color: '#4ade80',
+    fontSize: '13px',
+  },
+  selectGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(5, 1fr)',
+    gap: '12px',
+    maxWidth: '600px',
+    margin: '0 auto',
+  },
+  selectCard: {
+    background: '#141414',
+    border: '1px solid #222',
+    borderRadius: '12px',
+    padding: '20px 12px',
+    textAlign: 'center',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+  },
+  selectCardHover: {
+    background: '#1e1e1e',
+    border: '1px solid #444',
+    transform: 'scale(1.05)',
+  },
+  selectFlag: {
+    fontSize: '32px',
+    marginBottom: '8px',
+  },
+  selectName: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: '13px',
+    marginBottom: '4px',
+  },
+  selectSub: {
+    color: '#555',
+    fontSize: '11px',
+  },
+}
+
 export default function App() {
   const [selectedLang, setSelectedLang] = useState(null)
   const [isListening, setIsListening] = useState(false)
@@ -41,7 +234,7 @@ export default function App() {
 
   const startListening = useCallback(() => {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-      setError('Browser ไม่รองรับ Web Speech API (ใช้ Chrome หรือ Edge)')
+      setError('Browser does not support Web Speech API. Use Chrome or Edge.')
       return
     }
 
@@ -64,7 +257,7 @@ export default function App() {
         if (event.results[i].isFinal) {
           const translated = await translate(transcript, selectedLang.code)
           setHistory(prev => [...prev, {
-            id: Date.now(),
+            id: Date.now() + Math.random(),
             source: transcript,
             translated,
             time: new Date().toLocaleTimeString('th-TH'),
@@ -112,22 +305,29 @@ export default function App() {
 
   if (!selectedLang) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 flex items-center justify-center p-4">
-        <div className="max-w-2xl w-full">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-white mb-2">📺 Live Translator</h1>
-            <p className="text-gray-400">Real-time voice translation to Thai</p>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+      <div style={styles.body}>
+        <style>{`
+          @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        `}</style>
+        <div style={{ padding: '60px 20px', textAlign: 'center' }}>
+          <h1 style={{ fontSize: '36px', fontWeight: 'bold', marginBottom: '8px' }}>
+            Live Translator
+          </h1>
+          <p style={{ color: '#555', marginBottom: '40px', fontSize: '14px' }}>
+            Real-time voice translation to Thai
+          </p>
+          <div style={styles.selectGrid}>
             {LANGUAGES.map(lang => (
               <button
                 key={lang.code}
                 onClick={() => setSelectedLang(lang)}
-                className="bg-white/10 hover:bg-white/20 backdrop-blur rounded-xl p-4 text-center transition-all hover:scale-105 border border-white/10"
+                style={styles.selectCard}
+                onMouseEnter={e => Object.assign(e.target.style, styles.selectCardHover)}
+                onMouseLeave={e => { e.target.style.background = '#141414'; e.target.style.border = '1px solid #222'; e.target.style.transform = 'none'; }}
               >
-                <div className="text-3xl mb-2">{lang.flag}</div>
-                <div className="text-white font-medium text-sm">{lang.name}</div>
-                <div className="text-gray-400 text-xs">→ 🇹🇭 Thai</div>
+                <div style={styles.selectFlag}>{lang.flag}</div>
+                <div style={styles.selectName}>{lang.name}</div>
+                <div style={styles.selectSub}>Thai</div>
               </button>
             ))}
           </div>
@@ -137,72 +337,69 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 flex flex-col">
-      <header className="bg-black/30 backdrop-blur p-4 flex items-center justify-between border-b border-white/10">
-        <div className="flex items-center gap-3">
+    <div style={styles.body}>
+      <style>{`
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+      `}</style>
+
+      <header style={styles.header}>
+        <div style={styles.langInfo}>
           <button
             onClick={() => { stopListening(); setSelectedLang(null) }}
-            className="text-gray-400 hover:text-white text-sm"
+            style={styles.backBtn}
           >
-            ← เลือกภาษาใหม่
+            Back
           </button>
-          <span className="text-2xl">{selectedLang.flag}</span>
-          <span className="text-white font-bold">{selectedLang.name} → 🇹🇭 Thai</span>
+          <span style={styles.langFlag}>{selectedLang.flag}</span>
+          <span style={styles.langText}>{selectedLang.name} → Thai</span>
         </div>
         <button
           onClick={toggleListening}
-          className={`px-6 py-2 rounded-full font-bold transition-all ${
-            isListening
-              ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse'
-              : 'bg-green-500 hover:bg-green-600 text-white'
-          }`}
+          style={{
+            ...styles.startBtn,
+            ...(isListening ? styles.startBtnActive : styles.startBtnInactive),
+          }}
         >
-          {isListening ? '⏹ หยุด' : '🎤 เริ่มฟัง'}
+          {isListening ? 'Stop' : 'Start Listening'}
         </button>
       </header>
 
-      {error && (
-        <div className="bg-red-500/20 text-red-300 p-3 text-center text-sm">{error}</div>
-      )}
+      {error && <div style={styles.error}>{error}</div>}
 
-      <main className="flex-1 overflow-y-auto p-4 max-w-3xl mx-auto w-full">
+      <main style={styles.main}>
         {history.length === 0 && !isListening && (
-          <div className="text-center text-gray-500 mt-20">
-            <div className="text-6xl mb-4">🎙️</div>
-            <p>กด "เริ่มฟัง" แล้วพูดภาษา{selectedLang.name}</p>
-            <p className="text-sm mt-2">เสียงจะแปลเป็นภาษาไทยแบบ real-time</p>
+          <div style={styles.emptyState}>
+            <div style={styles.emptyIcon}>🎙️</div>
+            <p style={styles.emptyText}>Press "Start Listening" and speak {selectedLang.name}</p>
+            <p style={styles.emptySubtext}>Voice will be translated to Thai in real-time</p>
           </div>
         )}
 
-        <div className="space-y-3">
-          {history.map(item => (
-            <div key={item.id} className="bg-white/5 backdrop-blur rounded-xl p-4 border border-white/10">
-              <div className="flex items-center gap-2 mb-2 text-xs text-gray-400">
-                <span>{item.time}</span>
-                <span>{item.lang.flag}</span>
-              </div>
-              <div className="text-white mb-1">{item.source}</div>
-              <div className="text-green-400 text-lg">🇹🇭 {item.translated}</div>
+        {history.map(item => (
+          <div key={item.id} style={styles.card}>
+            <div style={styles.cardMeta}>
+              <span>{item.time}</span>
+              <span>{item.lang.flag}</span>
             </div>
-          ))}
+            <div style={styles.cardSource}>{item.source}</div>
+            <div style={styles.cardTranslated}>🇹🇭 {item.translated}</div>
+          </div>
+        ))}
 
-          {interim && (
-            <div className="bg-white/5 backdrop-blur rounded-xl p-4 border border-white/20 opacity-60">
-              <div className="text-gray-400 text-xs mb-1">กำลังฟัง...</div>
-              <div className="text-white">{interim}</div>
-            </div>
-          )}
-        </div>
+        {interim && (
+          <div style={styles.interimCard}>
+            <div style={styles.interimLabel}>Listening...</div>
+            <div style={styles.interimText}>{interim}</div>
+          </div>
+        )}
 
         <div ref={historyEndRef} />
       </main>
 
       {isListening && (
-        <div className="bg-black/30 p-3 text-center">
-          <div className="flex items-center justify-center gap-2 text-green-400">
-            <span className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></span>
-            <span className="text-sm">กำลังฟังและแปล...</span>
-          </div>
+        <div style={styles.footer}>
+          <span style={styles.footerDot}></span>
+          <span style={styles.footerText}>Listening and translating...</span>
         </div>
       )}
     </div>
