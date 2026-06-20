@@ -88,6 +88,7 @@ export default function App() {
     let interimCardId = null
     let interimSource = ''
     let lastTranslatedText = ''
+    let lastTranslatedLen = 0
     let translateTimer = null
 
     const doTranslate = (text, cardId) => {
@@ -139,12 +140,13 @@ export default function App() {
           interimSource = interimText
         }
 
-        if (interimText !== lastTranslatedText) {
+        if (interimText !== lastTranslatedText && interimText.length - lastTranslatedLen > 20) {
           clearTimeout(translateTimer)
           translateTimer = setTimeout(() => {
             lastTranslatedText = interimText
+            lastTranslatedLen = interimText.length
             doTranslate(interimText, interimCardId)
-          }, 100)
+          }, 200)
         }
       }
     }
