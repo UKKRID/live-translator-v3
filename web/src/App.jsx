@@ -19,15 +19,17 @@ const TEXT_DIM = '#b0b0b0'
 const GREEN = '#4ade80'
 const cache = new Map()
 
-function translateXHR(text, langCode) {
+function xhrTranslate(text, langCode) {
   return new Promise((resolve) => {
     const xhr = new XMLHttpRequest()
-    xhr.open('GET', `https://translate.googleapis.com/translate_a/t?client=gtx&sl=${langCode}&tl=th&dt=t&q=${encodeURIComponent(text)}`, true)
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${langCode}&tl=th&dt=t&q=${encodeURIComponent(text)}`
+    xhr.open('GET', url, true)
     xhr.timeout = 3000
     xhr.onload = () => {
       try {
         const d = JSON.parse(xhr.responseText)
-        resolve(d[0] ? d[0][0] || text : text)
+        const result = d[0].map(s => s[0]).join('')
+        resolve(result || text)
       } catch { resolve(text) }
     }
     xhr.onerror = () => resolve(text)
@@ -40,7 +42,7 @@ async function fastTranslate(text, srcLang) {
   const key = srcLang + '|' + text
   if (cache.has(key)) return cache.get(key)
   const langCode = srcLang.split('-')[0]
-  const result = await translateXHR(text, langCode)
+  const result = await xhrTranslate(text, langCode)
   if (cache.size > 200) cache.clear()
   cache.set(key, result)
   return result
@@ -55,6 +57,7 @@ export default function App() {
   const listRef = useRef(null)
   const interimRef = useRef(null)
   const countRef = useRef(0)
+  const silenceRef = useRef(null)
 
   useEffect(() => {
     if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight
@@ -89,8 +92,10 @@ export default function App() {
           const now = new Date().toLocaleTimeString('th-TH')
           const id = addCard(text, now, lang.flag)
           fastTranslate(text, lang.code).then(t => updateCard(id, t))
+          lastFinalTime = Date.now()
         } else {
           interimText += text
+          lastInterimText = text
         }
       }
       if (interimRef.current) {
@@ -102,12 +107,35 @@ export default function App() {
     r.onerror = () => {}
     r.onend = () => {}
 
+    let lastFinalTime = Date.now()
+    let lastInterimText = ''
+    let lastInterimLen = 0
+
+    silenceRef.current = setInterval(() => {
+      if (!isOn) return
+      if (lastInterimText && lastInterimText.length > lastInterimLen && Date.now() - lastFinalTime > 1500) {
+        const text = lastInterimText
+        if (text.length > 2) {
+          const now = new Date().toLocaleTimeString('th-TH')
+          const id = addCard(text, now, lang.flag)
+          fastTranslate(text, lang.code).then(t => updateCard(id, t))
+          lastFinalTime = Date.now()
+          lastInterimText = ''
+          lastInterimLen = 0
+          if (interimRef.current) interimRef.current.style.display = 'none'
+        }
+      }
+      if (!lastInterimText || lastInterimText.length === lastInterimLen) return
+      lastInterimLen = lastInterimText.length
+    }, 500)
+
     recogRef.current = r
     r.start()
   }, [lang, isOn])
 
   const stop = useCallback(() => {
     setIsOn(false)
+    if (silenceRef.current) { clearInterval(silenceRef.current); silenceRef.current = null }
     if (recogRef.current) { recogRef.current.stop(); recogRef.current = null }
   }, [])
 
