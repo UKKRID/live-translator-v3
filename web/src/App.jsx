@@ -73,7 +73,7 @@ export default function App() {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) return
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition
     const r = new SR()
-    r.continuous = true
+    r.continuous = false
     r.interimResults = true
     r.lang = lang.code
     r.maxAlternatives = 1
@@ -89,18 +89,23 @@ export default function App() {
           const now = new Date().toLocaleTimeString('th-TH')
           const id = addCard(text, now, lang.flag)
           fastTranslate(text, lang.code).then(t => updateCard(id, t))
+          try { r.stop() } catch {}
         } else {
           interimText += text
         }
       }
       if (interimRef.current) {
-        interimRef.current.textContent = interimText || 'Listening...'
+        interimRef.current.textContent = interimText
         interimRef.current.style.display = interimText ? 'block' : 'none'
       }
     }
 
     r.onerror = () => {}
-    r.onend = () => { if (isOn) try { r.start() } catch {} }
+    r.onend = () => {
+      if (isOn) {
+        setTimeout(() => { try { r.start() } catch {} }, 50)
+      }
+    }
 
     recogRef.current = r
     r.start()
