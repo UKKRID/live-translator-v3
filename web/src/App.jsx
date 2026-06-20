@@ -184,7 +184,7 @@ export default function App() {
             </p>
           </div>
         )}
-        {cards.map(c => (
+        {cards.slice(-5).map(c => (
           <div key={c.id} className="card">
             <div className="meta"><span>{c.flag}</span></div>
             <div className="src">{c.src}</div>
