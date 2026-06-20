@@ -113,7 +113,7 @@ export default function App() {
 
     silenceRef.current = setInterval(() => {
       if (!isOn) return
-      if (lastInterimText && lastInterimText.length > lastInterimLen && Date.now() - lastFinalTime > 1500) {
+      if (lastInterimText && lastInterimText.length > lastInterimLen && Date.now() - lastFinalTime > 800) {
         const text = lastInterimText
         if (text.length > 2) {
           const now = new Date().toLocaleTimeString('th-TH')
@@ -127,7 +127,7 @@ export default function App() {
       }
       if (!lastInterimText || lastInterimText.length === lastInterimLen) return
       lastInterimLen = lastInterimText.length
-    }, 500)
+    }, 300)
 
     recogRef.current = r
     r.start()
