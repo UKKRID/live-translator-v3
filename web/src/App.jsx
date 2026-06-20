@@ -101,6 +101,7 @@ const styles = {
   emptyText: {
     fontSize: '16px',
     color: '#ccc',
+    fontWeight: '500',
   },
   emptySubtext: {
     fontSize: '13px',
@@ -120,7 +121,8 @@ const styles = {
     gap: '8px',
     marginBottom: '8px',
     fontSize: '12px',
-    color: '#888',
+    color: '#999',
+    fontWeight: '500',
   },
   cardSource: {
     color: '#e0e0e0',
@@ -128,12 +130,14 @@ const styles = {
     lineHeight: 1.5,
     marginBottom: '8px',
     wordBreak: 'break-word',
+    fontWeight: '500',
   },
   cardTranslated: {
     color: '#4ade80',
     fontSize: '18px',
     lineHeight: 1.5,
     wordBreak: 'break-word',
+    fontWeight: '600',
   },
   interimCard: {
     background: '#1a1a1a',
@@ -150,6 +154,7 @@ const styles = {
   interimText: {
     color: '#bbb',
     fontSize: '15px',
+    fontWeight: '500',
   },
   footer: {
     background: '#111111',
@@ -197,7 +202,7 @@ const styles = {
   },
   selectName: {
     color: '#e0e0e0',
-    fontWeight: '600',
+    fontWeight: '700',
     fontSize: '13px',
     marginBottom: '4px',
   },
