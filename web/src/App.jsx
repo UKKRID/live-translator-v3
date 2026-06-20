@@ -19,7 +19,7 @@ const cache = new Map()
 async function translate(text, sl) {
   const k = sl + '|' + text
   if (cache.has(k)) return cache.get(k)
-  return new Promise(r => {
+    return new Promise(r => {
     const x = new XMLHttpRequest()
     x.open('GET', `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sl.split('-')[0]}&tl=th&dt=t&q=${encodeURIComponent(text)}`, true)
     x.timeout = 3000
@@ -27,7 +27,7 @@ async function translate(text, sl) {
     x.onerror = () => r(text)
     x.ontimeout = () => r(text)
     x.send()
-  }).then(t => { if (cache.size > 200) cache.clear(); cache.set(k, t); return t })
+  }).then(t => { if (cache.size > 200) cache.clear(); cache.set(k, t); doFlash(); return t })
 }
 
 export default function App() {
@@ -42,7 +42,10 @@ export default function App() {
   const timerRef = useRef(null)
   const processingRef = useRef(false)
 
+  const [flash, setFlash] = useState(false)
+
   const scroll = () => { if (boxRef.current) boxRef.current.scrollTop = boxRef.current.scrollHeight }
+  const doFlash = () => { setFlash(true); setTimeout(() => setFlash(false), 400) }
   useLayoutEffect(scroll)
   useEffect(scroll, [cards])
 
@@ -139,7 +142,7 @@ export default function App() {
   }
 
   return (
-    <div style={{ height: '100vh', background: '#0d0d0d', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <div style={{ height: '100vh', background: flash ? '#0f1a12' : '#0d0d0d', display: 'flex', flexDirection: 'column', overflow: 'hidden', transition: 'background 0.3s ease' }}>
       <style>{`
         *{margin:0;padding:0;box-sizing:border-box}
         html,body,#root{height:100%;overflow:hidden}
