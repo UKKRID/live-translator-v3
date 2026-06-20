@@ -19,7 +19,7 @@ const cache = new Map()
 async function translate(text, sl) {
   const k = sl + '|' + text
   if (cache.has(k)) return cache.get(k)
-    return new Promise(r => {
+  return new Promise(r => {
     const x = new XMLHttpRequest()
     x.open('GET', `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sl.split('-')[0]}&tl=th&dt=t&q=${encodeURIComponent(text)}`, true)
     x.timeout = 3000
@@ -35,11 +35,11 @@ export default function App() {
   const [lang, setLang] = useState(null)
   const [isOn, setIsOn] = useState(false)
   const [cards, setCards] = useState([])
+  const [interim, setInterim] = useState('')
+  const [flash, setFlash] = useState(false)
   const boxRef = useRef(null)
   const recogRef = useRef(null)
   const idRef = useRef(0)
-
-  const [flash, setFlash] = useState(false)
 
   const scroll = () => { if (boxRef.current) boxRef.current.scrollTop = boxRef.current.scrollHeight }
   const doFlash = () => { setFlash(true); setTimeout(() => setFlash(false), 400) }
@@ -53,23 +53,6 @@ export default function App() {
   }
   const updCard = (id, th) => setCards(p => p.map(c => c.id === id ? { ...c, th } : c))
 
-  const activeCardRef = useRef(null)
-  const transTimerRef = useRef(null)
-
-  const createCard = (src, flag) => {
-    const id = ++idRef.current
-    setCards(p => [...p, { id, src, th: '...', flag }])
-    return id
-  }
-  const updateCard = (id, patch) => setCards(p => p.map(c => c.id === id ? { ...c, ...patch } : c))
-
-  const doTranslate = (id, text) => {
-    translate(text, lang.code).then(t => {
-      updateCard(id, { th: t })
-      doFlash()
-    })
-  }
-
   const start = useCallback(() => {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) return
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition
@@ -82,27 +65,18 @@ export default function App() {
     r.onstart = () => setIsOn(true)
 
     r.onresult = (ev) => {
+      let interimText = ''
       for (let i = ev.resultIndex; i < ev.results.length; i++) {
         const txt = ev.results[i][0].transcript
         if (ev.results[i].isFinal) {
-          if (!activeCardRef.current) {
-            activeCardRef.current = createCard(txt, lang.flag)
-          } else {
-            updateCard(activeCardRef.current, { src: txt })
-          }
-          doTranslate(activeCardRef.current, txt)
-          activeCardRef.current = null
+          const id = addCard(txt, lang.flag)
+          translate(txt, lang.code).then(t => { updCard(id, t); doFlash() })
+          setInterim('')
         } else {
-          if (!activeCardRef.current) {
-            activeCardRef.current = createCard(txt, lang.flag)
-          } else {
-            updateCard(activeCardRef.current, { src: txt })
-          }
-          clearTimeout(transTimerRef.current)
-          const cardId = activeCardRef.current
-          transTimerRef.current = setTimeout(() => doTranslate(cardId, txt), 200)
+          interimText += txt
         }
       }
+      if (interimText) setInterim(interimText)
       scroll()
     }
 
@@ -115,8 +89,7 @@ export default function App() {
 
   const stop = useCallback(() => {
     setIsOn(false)
-    clearTimeout(transTimerRef.current)
-    activeCardRef.current = null
+    setInterim('')
     if (recogRef.current) { recogRef.current.stop(); recogRef.current = null }
   }, [])
 
@@ -157,6 +130,8 @@ export default function App() {
         .src{color:#fff;font-size:16px;font-weight:500;line-height:1.5;word-break:break-word}
         .th{color:${GRN};font-size:20px;font-weight:700;line-height:1.5;word-break:break-word}
         .meta{display:flex;gap:8px;font-size:12px;color:${DIM};font-weight:600;margin-bottom:8px}
+        .interim{background:${BG};border-radius:14px;padding:16px;margin-bottom:12px;border:1px dashed #555}
+        .interim .src{color:#999;font-size:15px}
       `}</style>
 
       <header style={{ background: '#141414', borderBottom: `1px solid ${BD}`, padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
@@ -173,7 +148,7 @@ export default function App() {
       </header>
 
       <div ref={boxRef} className="box">
-        {cards.length === 0 && (
+        {cards.length === 0 && !interim && (
           <div style={{ textAlign: 'center', marginTop: '100px' }}>
             <div style={{ fontSize: '72px', marginBottom: '20px' }}>🎙️</div>
             <p style={{ fontSize: '20px', color: '#fff', fontWeight: '600', marginBottom: '8px' }}>
@@ -184,13 +159,18 @@ export default function App() {
             </p>
           </div>
         )}
-        {cards.slice(-5).map(c => (
+        {cards.map(c => (
           <div key={c.id} className="card">
             <div className="meta"><span>{c.flag}</span></div>
             <div className="src">{c.src}</div>
             <div className="th">🇹🇭 {c.th}</div>
           </div>
         ))}
+        {interim && (
+          <div className="interim">
+            <div className="src">{interim}</div>
+          </div>
+        )}
       </div>
 
       {isOn && (
