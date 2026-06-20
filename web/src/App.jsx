@@ -19,24 +19,31 @@ const TEXT_DIM = '#b0b0b0'
 const GREEN = '#4ade80'
 const cache = new Map()
 
+function translateXHR(text, langCode) {
+  return new Promise((resolve) => {
+    const xhr = new XMLHttpRequest()
+    xhr.open('GET', `https://translate.googleapis.com/translate_a/t?client=gtx&sl=${langCode}&tl=th&dt=t&q=${encodeURIComponent(text)}`, true)
+    xhr.timeout = 3000
+    xhr.onload = () => {
+      try {
+        const d = JSON.parse(xhr.responseText)
+        resolve(d[0] ? d[0][0] || text : text)
+      } catch { resolve(text) }
+    }
+    xhr.onerror = () => resolve(text)
+    xhr.ontimeout = () => resolve(text)
+    xhr.send()
+  })
+}
+
 async function fastTranslate(text, srcLang) {
   const key = srcLang + '|' + text
   if (cache.has(key)) return cache.get(key)
   const langCode = srcLang.split('-')[0]
-  try {
-    const ctrl = new AbortController()
-    const t = setTimeout(() => ctrl.abort(), 3000)
-    const r = await fetch(
-      `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${langCode}&tl=th&dt=t&q=${encodeURIComponent(text)}`,
-      { signal: ctrl.signal }
-    )
-    clearTimeout(t)
-    const d = await r.json()
-    const result = d[0].map(s => s[0]).join('')
-    if (cache.size > 200) cache.clear()
-    cache.set(key, result)
-    return result
-  } catch { return text }
+  const result = await translateXHR(text, langCode)
+  if (cache.size > 200) cache.clear()
+  cache.set(key, result)
+  return result
 }
 
 export default function App() {
