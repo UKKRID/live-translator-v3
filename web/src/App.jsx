@@ -27,7 +27,7 @@ async function translate(text, sl) {
     x.onerror = () => r(text)
     x.ontimeout = () => r(text)
     x.send()
-  }).then(t => { if (cache.size > 200) cache.clear(); cache.set(k, t); doFlash(); return t })
+  }).then(t => { if (cache.size > 200) cache.clear(); cache.set(k, t); return t })
 }
 
 export default function App() {
@@ -63,6 +63,7 @@ export default function App() {
     const id = addCard(text, lang.flag)
     translate(text, lang.code).then(t => {
       updCard(id, t)
+      doFlash()
       scroll()
     })
   }, [lang])
