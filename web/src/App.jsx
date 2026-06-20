@@ -237,7 +237,7 @@ export default function App() {
             <p style={{ fontSize: '15px', color: TEXT_DIM }}>Voice will be translated to Thai in real-time</p>
           </div>
         )}
-        {history.map(item => (
+        {history.filter(item => item.source.length >= 4).map(item => (
           <div key={item.id} className="card">
             <div className="meta"><span>{item.time}</span><span>{item.flag}</span></div>
             <div className="src">{item.source}</div>
