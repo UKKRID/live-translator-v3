@@ -161,11 +161,15 @@ export default function App() {
       </header>
 
       <div ref={boxRef} className="box">
-        {!isOn && cards.length === 0 && (
+        {cards.length === 0 && (
           <div style={{ textAlign: 'center', marginTop: '100px' }}>
             <div style={{ fontSize: '72px', marginBottom: '20px' }}>🎙️</div>
-            <p style={{ fontSize: '20px', color: '#fff', fontWeight: '600', marginBottom: '8px' }}>Press "Start" and speak {lang.name}</p>
-            <p style={{ fontSize: '15px', color: DIM }}>Voice will be translated to Thai in real-time</p>
+            <p style={{ fontSize: '20px', color: '#fff', fontWeight: '600', marginBottom: '8px' }}>
+              {isOn ? `Listening ${lang.name}...` : `Press "Start" and speak ${lang.name}`}
+            </p>
+            <p style={{ fontSize: '15px', color: DIM }}>
+              {isOn ? 'Waiting for speech...' : 'Voice will be translated to Thai in real-time'}
+            </p>
           </div>
         )}
         {cards.map(c => (
