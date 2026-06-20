@@ -121,7 +121,16 @@ export default function App() {
       }
 
       if (interimText) {
-        if (!interimCardId) {
+        if (interimText.length > 80 && interimCardId) {
+          const cutText = interimText.slice(0, 80)
+          const remainText = interimText.slice(80)
+          setHistory(prev => prev.map(item => item.id === interimCardId ? { ...item, source: cutText } : item))
+          doTranslate(cutText, interimCardId)
+          const now = new Date().toLocaleTimeString('th-TH')
+          interimCardId = addCard(remainText, now, lang.flag)
+          interimSource = remainText
+          doTranslate(remainText, interimCardId)
+        } else if (!interimCardId) {
           const now = new Date().toLocaleTimeString('th-TH')
           interimCardId = addCard(interimText, now, lang.flag)
           interimSource = interimText
