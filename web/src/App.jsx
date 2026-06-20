@@ -13,208 +13,21 @@ const LANGUAGES = [
   { code: 'ar-SA', name: 'Arabic', flag: '🇸🇦' },
 ]
 
-const styles = {
-  body: {
-    minHeight: '100vh',
-    background: '#0a0a0a',
-    color: '#ffffff',
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-    margin: 0,
-    padding: 0,
-  },
-  header: {
-    background: '#111111',
-    borderBottom: '1px solid #222',
-    padding: '16px 20px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    position: 'sticky',
-    top: 0,
-    zIndex: 100,
-  },
-  backBtn: {
-    color: '#e0e0e0',
-    background: '#333',
-    border: '1px solid #555',
-    cursor: 'pointer',
-    fontSize: '13px',
-    padding: '6px 14px',
-    borderRadius: '6px',
-  },
-  langInfo: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-  },
-  langFlag: {
-    fontSize: '24px',
-  },
-  langText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: '16px',
-  },
-  startBtn: {
-    padding: '10px 24px',
-    borderRadius: '24px',
-    border: 'none',
-    fontWeight: 'bold',
-    fontSize: '14px',
-    cursor: 'pointer',
-    transition: 'all 0.2s',
-  },
-  startBtnActive: {
-    background: '#dc2626',
-    color: '#fff',
-    animation: 'pulse 1.5s infinite',
-  },
-  startBtnInactive: {
-    background: '#16a34a',
-    color: '#fff',
-  },
-  error: {
-    background: 'rgba(220, 38, 38, 0.15)',
-    color: '#fca5a5',
-    padding: '12px',
-    textAlign: 'center',
-    fontSize: '14px',
-  },
-  main: {
-    flex: 1,
-    overflowY: 'auto',
-    padding: '20px',
-    maxWidth: '700px',
-    margin: '0 auto',
-    width: '100%',
-    boxSizing: 'border-box',
-  },
-  emptyState: {
-    textAlign: 'center',
-    color: '#cccccc',
-    marginTop: '80px',
-  },
-  emptyIcon: {
-    fontSize: '64px',
-    marginBottom: '16px',
-  },
-  emptyText: {
-    fontSize: '18px',
-    color: '#ffffff',
-    fontWeight: '500',
-  },
-  emptySubtext: {
-    fontSize: '14px',
-    color: '#aaaaaa',
-    marginTop: '8px',
-    fontWeight: '500',
-  },
-  card: {
-    background: '#1e1e1e',
-    borderRadius: '12px',
-    padding: '16px',
-    marginBottom: '12px',
-    border: '1px solid #444',
-  },
-  cardMeta: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    marginBottom: '8px',
-    fontSize: '12px',
-    color: '#aaaaaa',
-    fontWeight: '600',
-  },
-  cardSource: {
-    color: '#ffffff',
-    fontSize: '16px',
-    lineHeight: 1.5,
-    marginBottom: '8px',
-    wordBreak: 'break-word',
-    fontWeight: '500',
-  },
-  cardTranslated: {
-    color: '#4ade80',
-    fontSize: '20px',
-    lineHeight: 1.5,
-    wordBreak: 'break-word',
-    fontWeight: '600',
-  },
-  interimCard: {
-    background: '#1e1e1e',
-    borderRadius: '12px',
-    padding: '16px',
-    marginBottom: '12px',
-    border: '2px dashed #555',
-  },
-  interimLabel: {
-    color: '#aaaaaa',
-    fontSize: '12px',
-    marginBottom: '6px',
-    fontWeight: '600',
-  },
-  interimText: {
-    color: '#ffffff',
-    fontSize: '16px',
-    fontWeight: '500',
-  },
-  footer: {
-    background: '#111111',
-    borderTop: '1px solid #333',
-    padding: '12px',
-    textAlign: 'center',
-  },
-  footerDot: {
-    display: 'inline-block',
-    width: '10px',
-    height: '10px',
-    background: '#22c55e',
-    borderRadius: '50%',
-    marginRight: '8px',
-    animation: 'pulse 1.5s infinite',
-  },
-  footerText: {
-    color: '#4ade80',
-    fontSize: '14px',
-    fontWeight: '600',
-  },
-  selectGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(5, 1fr)',
-    gap: '12px',
-    maxWidth: '600px',
-    margin: '0 auto',
-  },
-  selectCard: {
-    background: '#1e1e1e',
-    border: '1px solid #444',
-    borderRadius: '12px',
-    padding: '20px 12px',
-    textAlign: 'center',
-    cursor: 'pointer',
-    transition: 'all 0.2s',
-  },
-  selectCardHover: {
-    background: '#2a2a2a',
-    border: '1px solid #666',
-    transform: 'scale(1.05)',
-  },
-  selectFlag: {
-    fontSize: '32px',
-    marginBottom: '8px',
-  },
-  selectName: {
-    color: '#ffffff',
-    fontWeight: '700',
-    fontSize: '14px',
-    marginBottom: '4px',
-  },
-  selectSub: {
-    color: '#aaaaaa',
-    fontSize: '12px',
-    fontWeight: '500',
-  },
-}
+const CARD_BG = '#1c1c1c'
+const BORDER = '#3a3a3a'
+const TEXT = '#f0f0f0'
+const TEXT_DIM = '#b0b0b0'
+const GREEN = '#4ade80'
+
+const css = `
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0d0d0d; color: #f0f0f0; font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+  @keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #111; }
+  ::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+`
 
 export default function App() {
   const [selectedLang, setSelectedLang] = useState(null)
@@ -247,18 +60,13 @@ export default function App() {
       setError('Browser does not support Web Speech API. Use Chrome or Edge.')
       return
     }
-
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
     const recognition = new SpeechRecognition()
-
     recognition.continuous = true
     recognition.interimResults = true
     recognition.lang = selectedLang.code
 
-    recognition.onstart = () => {
-      setIsListening(true)
-      setError('')
-    }
+    recognition.onstart = () => { setIsListening(true); setError('') }
 
     recognition.onresult = async (event) => {
       let interimText = ''
@@ -281,17 +89,8 @@ export default function App() {
       if (interimText) setInterim(interimText)
     }
 
-    recognition.onerror = (event) => {
-      if (event.error !== 'no-speech') {
-        setError(`Error: ${event.error}`)
-      }
-    }
-
-    recognition.onend = () => {
-      if (isListening) {
-        try { recognition.start() } catch {}
-      }
-    }
+    recognition.onerror = (e) => { if (e.error !== 'no-speech') setError(`Error: ${e.error}`) }
+    recognition.onend = () => { if (isListening) try { recognition.start() } catch {} }
 
     recognitionRef.current = recognition
     recognition.start()
@@ -299,45 +98,38 @@ export default function App() {
 
   const stopListening = useCallback(() => {
     setIsListening(false)
-    if (recognitionRef.current) {
-      recognitionRef.current.stop()
-      recognitionRef.current = null
-    }
+    if (recognitionRef.current) { recognitionRef.current.stop(); recognitionRef.current = null }
   }, [])
 
-  const toggleListening = () => {
-    if (isListening) {
-      stopListening()
-    } else {
-      startListening()
-    }
-  }
+  const toggleListening = () => { isListening ? stopListening() : startListening() }
 
   if (!selectedLang) {
     return (
-      <div style={styles.body}>
-        <style>{`
-          @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        `}</style>
+      <div style={{ minHeight: '100vh', background: '#0d0d0d' }}>
+        <style>{css}</style>
         <div style={{ padding: '60px 20px', textAlign: 'center' }}>
-          <h1 style={{ fontSize: '36px', fontWeight: 'bold', marginBottom: '8px' }}>
+          <h1 style={{ fontSize: '40px', fontWeight: '800', color: '#ffffff', marginBottom: '8px', letterSpacing: '-1px' }}>
             Live Translator
           </h1>
-          <p style={{ color: '#555', marginBottom: '40px', fontSize: '14px' }}>
+          <p style={{ color: TEXT_DIM, marginBottom: '48px', fontSize: '16px', fontWeight: '500' }}>
             Real-time voice translation to Thai
           </p>
-          <div style={styles.selectGrid}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '14px', maxWidth: '640px', margin: '0 auto' }}>
             {LANGUAGES.map(lang => (
               <button
                 key={lang.code}
                 onClick={() => setSelectedLang(lang)}
-                style={styles.selectCard}
-                onMouseEnter={e => Object.assign(e.target.style, styles.selectCardHover)}
-                onMouseLeave={e => { e.target.style.background = '#141414'; e.target.style.border = '1px solid #222'; e.target.style.transform = 'none'; }}
+                style={{
+                  background: CARD_BG, border: `1px solid ${BORDER}`, borderRadius: '14px',
+                  padding: '22px 12px', textAlign: 'center', cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = '#2a2a2a'; e.currentTarget.style.borderColor = '#666'; e.currentTarget.style.transform = 'scale(1.06)' }}
+                onMouseLeave={e => { e.currentTarget.style.background = CARD_BG; e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.transform = 'none' }}
               >
-                <div style={styles.selectFlag}>{lang.flag}</div>
-                <div style={styles.selectName}>{lang.name}</div>
-                <div style={styles.selectSub}>Thai</div>
+                <div style={{ fontSize: '36px', marginBottom: '10px' }}>{lang.flag}</div>
+                <div style={{ color: '#ffffff', fontWeight: '700', fontSize: '14px', marginBottom: '4px' }}>{lang.name}</div>
+                <div style={{ color: TEXT_DIM, fontSize: '12px', fontWeight: '500' }}>→ Thai</div>
               </button>
             ))}
           </div>
@@ -347,59 +139,71 @@ export default function App() {
   }
 
   return (
-    <div style={styles.body}>
-      <style>{`
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-      `}</style>
+    <div style={{ minHeight: '100vh', background: '#0d0d0d', display: 'flex', flexDirection: 'column' }}>
+      <style>{css}</style>
 
-      <header style={styles.header}>
-        <div style={styles.langInfo}>
+      <header style={{ background: '#141414', borderBottom: `1px solid ${BORDER}`, padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 100 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <button
             onClick={() => { stopListening(); setSelectedLang(null) }}
-            style={styles.backBtn}
+            style={{ color: '#ffffff', background: '#333', border: '1px solid #555', cursor: 'pointer', fontSize: '13px', fontWeight: '600', padding: '8px 16px', borderRadius: '8px' }}
           >
-            Back
+            ← Back
           </button>
-          <span style={styles.langFlag}>{selectedLang.flag}</span>
-          <span style={styles.langText}>{selectedLang.name} → Thai</span>
+          <span style={{ fontSize: '26px' }}>{selectedLang.flag}</span>
+          <span style={{ color: '#ffffff', fontWeight: '700', fontSize: '17px' }}>{selectedLang.name} → 🇹🇭 Thai</span>
         </div>
         <button
           onClick={toggleListening}
           style={{
-            ...styles.startBtn,
-            ...(isListening ? styles.startBtnActive : styles.startBtnInactive),
+            padding: '12px 28px', borderRadius: '28px', border: 'none', fontWeight: '700', fontSize: '15px',
+            cursor: 'pointer', color: '#ffffff',
+            background: isListening ? '#dc2626' : '#16a34a',
+            animation: isListening ? 'pulse 1.5s infinite' : 'none',
           }}
         >
-          {isListening ? 'Stop' : 'Start Listening'}
+          {isListening ? '⏹ Stop' : '🎤 Start'}
         </button>
       </header>
 
-      {error && <div style={styles.error}>{error}</div>}
+      {error && (
+        <div style={{ background: 'rgba(220,38,38,0.2)', color: '#ff6b6b', padding: '14px', textAlign: 'center', fontSize: '14px', fontWeight: '600' }}>
+          {error}
+        </div>
+      )}
 
-      <main style={styles.main}>
+      <main style={{ flex: 1, overflowY: 'auto', padding: '24px', maxWidth: '720px', margin: '0 auto', width: '100%' }}>
         {history.length === 0 && !isListening && (
-          <div style={styles.emptyState}>
-            <div style={styles.emptyIcon}>🎙️</div>
-            <p style={styles.emptyText}>Press "Start Listening" and speak {selectedLang.name}</p>
-            <p style={styles.emptySubtext}>Voice will be translated to Thai in real-time</p>
+          <div style={{ textAlign: 'center', color: TEXT_DIM, marginTop: '100px' }}>
+            <div style={{ fontSize: '72px', marginBottom: '20px' }}>🎙️</div>
+            <p style={{ fontSize: '20px', color: '#ffffff', fontWeight: '600', marginBottom: '8px' }}>
+              Press "Start" and speak {selectedLang.name}
+            </p>
+            <p style={{ fontSize: '15px', color: TEXT_DIM, fontWeight: '500' }}>
+              Voice will be translated to Thai in real-time
+            </p>
           </div>
         )}
 
         {history.map(item => (
-          <div key={item.id} style={styles.card}>
-            <div style={styles.cardMeta}>
+          <div key={item.id} style={{ background: CARD_BG, borderRadius: '14px', padding: '18px', marginBottom: '14px', border: `1px solid ${BORDER}` }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', fontSize: '13px', color: TEXT_DIM, fontWeight: '600' }}>
               <span>{item.time}</span>
               <span>{item.lang.flag}</span>
             </div>
-            <div style={styles.cardSource}>{item.source}</div>
-            <div style={styles.cardTranslated}>🇹🇭 {item.translated}</div>
+            <div style={{ color: '#ffffff', fontSize: '17px', lineHeight: 1.6, marginBottom: '10px', wordBreak: 'break-word', fontWeight: '500' }}>
+              {item.source}
+            </div>
+            <div style={{ color: GREEN, fontSize: '21px', lineHeight: 1.6, wordBreak: 'break-word', fontWeight: '700' }}>
+              🇹🇭 {item.translated}
+            </div>
           </div>
         ))}
 
         {interim && (
-          <div style={styles.interimCard}>
-            <div style={styles.interimLabel}>Listening...</div>
-            <div style={styles.interimText}>{interim}</div>
+          <div style={{ background: CARD_BG, borderRadius: '14px', padding: '18px', marginBottom: '14px', border: '2px dashed #555' }}>
+            <div style={{ color: TEXT_DIM, fontSize: '13px', marginBottom: '8px', fontWeight: '600' }}>Listening...</div>
+            <div style={{ color: '#ffffff', fontSize: '17px', fontWeight: '500' }}>{interim}</div>
           </div>
         )}
 
@@ -407,9 +211,9 @@ export default function App() {
       </main>
 
       {isListening && (
-        <div style={styles.footer}>
-          <span style={styles.footerDot}></span>
-          <span style={styles.footerText}>Listening and translating...</span>
+        <div style={{ background: '#141414', borderTop: `1px solid ${BORDER}`, padding: '14px', textAlign: 'center' }}>
+          <span style={{ display: 'inline-block', width: '12px', height: '12px', background: '#22c55e', borderRadius: '50%', marginRight: '10px', animation: 'blink 1s infinite' }}></span>
+          <span style={{ color: GREEN, fontSize: '15px', fontWeight: '700' }}>Listening and translating...</span>
         </div>
       )}
     </div>
