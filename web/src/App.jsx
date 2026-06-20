@@ -59,11 +59,15 @@ export default function App() {
   const countRef = useRef(0)
   const silenceRef = useRef(null)
 
+  const scrollDown = () => {
+    if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight
+  }
+
+  useEffect(() => { scrollDown() }, [history])
   useEffect(() => {
-    if (listRef.current) {
-      listRef.current.scrollTop = listRef.current.scrollHeight
-    }
-  }, [history])
+    const t = setInterval(scrollDown, 300)
+    return () => clearInterval(t)
+  }, [])
 
   const addCard = (source, time, flag) => {
     setHistory(prev => [...prev, { id: ++countRef.current, source, translated: '...', time, flag }])
