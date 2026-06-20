@@ -34,11 +34,13 @@ const styles = {
     zIndex: 100,
   },
   backBtn: {
-    color: '#888',
-    background: 'none',
-    border: 'none',
+    color: '#e0e0e0',
+    background: '#333',
+    border: '1px solid #555',
     cursor: 'pointer',
-    fontSize: '14px',
+    fontSize: '13px',
+    padding: '6px 14px',
+    borderRadius: '6px',
   },
   langInfo: {
     display: 'flex',
@@ -89,7 +91,7 @@ const styles = {
   },
   emptyState: {
     textAlign: 'center',
-    color: '#555',
+    color: '#aaa',
     marginTop: '80px',
   },
   emptyIcon: {
@@ -98,19 +100,19 @@ const styles = {
   },
   emptyText: {
     fontSize: '16px',
-    color: '#666',
+    color: '#ccc',
   },
   emptySubtext: {
     fontSize: '13px',
-    color: '#444',
+    color: '#999',
     marginTop: '8px',
   },
   card: {
-    background: '#161616',
+    background: '#1a1a1a',
     borderRadius: '12px',
     padding: '16px',
     marginBottom: '12px',
-    border: '1px solid #222',
+    border: '1px solid #333',
   },
   cardMeta: {
     display: 'flex',
@@ -118,10 +120,10 @@ const styles = {
     gap: '8px',
     marginBottom: '8px',
     fontSize: '12px',
-    color: '#555',
+    color: '#888',
   },
   cardSource: {
-    color: '#ccc',
+    color: '#e0e0e0',
     fontSize: '15px',
     lineHeight: 1.5,
     marginBottom: '8px',
@@ -138,21 +140,20 @@ const styles = {
     borderRadius: '12px',
     padding: '16px',
     marginBottom: '12px',
-    border: '1px solid #333',
-    opacity: 0.6,
+    border: '1px dashed #555',
   },
   interimLabel: {
-    color: '#555',
+    color: '#888',
     fontSize: '12px',
     marginBottom: '6px',
   },
   interimText: {
-    color: '#999',
+    color: '#bbb',
     fontSize: '15px',
   },
   footer: {
     background: '#111111',
-    borderTop: '1px solid #222',
+    borderTop: '1px solid #333',
     padding: '12px',
     textAlign: 'center',
   },
@@ -177,8 +178,8 @@ const styles = {
     margin: '0 auto',
   },
   selectCard: {
-    background: '#141414',
-    border: '1px solid #222',
+    background: '#1a1a1a',
+    border: '1px solid #333',
     borderRadius: '12px',
     padding: '20px 12px',
     textAlign: 'center',
@@ -186,8 +187,8 @@ const styles = {
     transition: 'all 0.2s',
   },
   selectCardHover: {
-    background: '#1e1e1e',
-    border: '1px solid #444',
+    background: '#252525',
+    border: '1px solid #555',
     transform: 'scale(1.05)',
   },
   selectFlag: {
@@ -195,13 +196,13 @@ const styles = {
     marginBottom: '8px',
   },
   selectName: {
-    color: '#fff',
+    color: '#e0e0e0',
     fontWeight: '600',
     fontSize: '13px',
     marginBottom: '4px',
   },
   selectSub: {
-    color: '#555',
+    color: '#888',
     fontSize: '11px',
   },
 }
