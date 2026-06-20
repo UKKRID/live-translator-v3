@@ -116,9 +116,11 @@ export default function App() {
     silenceRef.current = setInterval(() => {
       if (!isOn) return
       const now = Date.now()
-      if (lastInterimText && lastInterimText.length > lastInterimLen && now - lastFinalTime > 500) {
+      const len = lastInterimText ? lastInterimText.length : 0
+
+      if (len > 80 || (len > 15 && now - lastFinalTime > 1200) || (len > 5 && now - lastFinalTime > 2000)) {
         const text = lastInterimText
-        if (text.length > 15 || text.split(' ').length >= 3 || (now - lastFinalTime > 2000)) {
+        if (text.length > 2) {
           const ts = new Date().toLocaleTimeString('th-TH')
           const id = addCard(text, ts, lang.flag)
           fastTranslate(text, lang.code).then(t => updateCard(id, t))
@@ -128,6 +130,7 @@ export default function App() {
           if (interimRef.current) interimRef.current.style.display = 'none'
         }
       }
+
       if (!lastInterimText || lastInterimText.length === lastInterimLen) return
       lastInterimLen = lastInterimText.length
     }, 200)
