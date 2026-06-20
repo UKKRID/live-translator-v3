@@ -64,8 +64,6 @@ export default function App() {
 
     r.onstart = () => setIsOn(true)
 
-    let interimBuf = ''
-
     r.onresult = (ev) => {
       let interimText = ''
       for (let i = ev.resultIndex; i < ev.results.length; i++) {
@@ -74,27 +72,11 @@ export default function App() {
           const id = addCard(txt, lang.flag)
           translate(txt, lang.code).then(t => { updCard(id, t); doFlash() })
           setInterim('')
-          interimBuf = ''
         } else {
           interimText += txt
         }
       }
-
-      if (interimText) {
-        if (interimText.length > 60 && interimBuf.length <= 60) {
-          const cut = interimText.slice(0, 60)
-          const id = addCard(cut, lang.flag)
-          translate(cut, lang.code).then(t => { updCard(id, t); doFlash() })
-          interimBuf = interimText.slice(60)
-          setInterim(interimBuf)
-        } else if (interimText.length > 60) {
-          interimBuf = interimText
-          setInterim(interimBuf)
-        } else {
-          interimBuf = interimText
-          setInterim(interimText)
-        }
-      }
+      if (interimText) setInterim(interimText)
       scroll()
     }
 
