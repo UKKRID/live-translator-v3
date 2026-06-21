@@ -1,6 +1,6 @@
-# Live Translator V3
+# Live Translator V3 (Windows 11)
 
-Real-time voice translator for YouTube live streams. Captures system audio via BlackHole, translates to Thai.
+Real-time voice translator for YouTube live streams. Captures system audio via WASAPI Loopback, translates to Thai.
 
 ## Features
 
@@ -8,40 +8,42 @@ Real-time voice translator for YouTube live streams. Captures system audio via B
 - Speaker detection (🔵🔴)
 - Auto-save history (CSV + JSON)
 - Minimal latency
+- No microphone required - captures system audio directly
 
-## Setup
+## Setup (Windows 11)
 
-### 1. Install dependencies
+### 1. Enable Stereo Mix
 
-```bash
-brew install blackhole-2ch portaudio
-pip3 install SpeechRecognition deep-translator pyaudio numpy
-```
+1. Open **Settings → System → Sound**
+2. Scroll down, click **More sound settings**
+3. Go to **Recording** tab
+4. Right-click → **Show Disabled Devices**
+5. Right-click **Stereo Mix** → **Enable**
+6. Right-click **Stereo Mix** → **Set as Default Device**
 
-### 2. Restart Mac after installing BlackHole
+> If Stereo Mix is not available, install [VB-Audio Virtual Cable](https://vb-audio.com/Cable/) and set it as default recording device.
 
-### 3. Create Multi-Output Device
-
-Open **Audio MIDI Setup** → Click **+** → **Create Multi-Output Device**
-
-Add:
-- ☑ BlackHole 2ch (check **Drift Correction**)
-- ☑ Built-in Output
-
-Set as default output.
-
-### 4. Run
+### 2. Install Python dependencies
 
 ```bash
-python3 live_translator_v3.py
+pip install SpeechRecognition deep-translator sounddevice numpy
 ```
 
-## Toggle Audio
+### 3. Run
 
 ```bash
-chmod +x toggle_audio.sh
-./toggle_audio.sh  # Toggle between Multi-Output and speakers
+python live_translator_v3.py
 ```
+
+## Alternative: VB-Audio Virtual Cable
+
+If Stereo Mix is not available:
+
+1. Download [VB-Audio Virtual Cable](https://vb-audio.com/Cable/) (free)
+2. Install and restart
+3. Set **CABLE Input** as default playback device (Sound Settings → Playback)
+4. Set **CABLE Output** as default recording device (Sound Settings → Recording)
+5. Run the script
 
 ## Output
 
@@ -51,6 +53,6 @@ chmod +x toggle_audio.sh
 
 ## Requirements
 
-- macOS with BlackHole installed
+- Windows 10/11 with WASAPI support
 - Python 3.8+
 - Internet connection (Google Speech API + Google Translate)
