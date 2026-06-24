@@ -1,4 +1,24 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
+import SubscriptionModal from './components/SubscriptionModal'
+import TimerBadge from './components/TimerBadge'
+
+const FREE_TIER_DURATION = 3600
+
+function getUsageData() {
+  try {
+    const data = JSON.parse(localStorage.getItem('lt_usage') || '{}')
+    if (!data.startTime) {
+      return { startTime: Date.now(), isPro: false, plan: null }
+    }
+    return data
+  } catch {
+    return { startTime: Date.now(), isPro: false, plan: null }
+  }
+}
+
+function saveUsageData(data) {
+  localStorage.setItem('lt_usage', JSON.stringify(data))
+}
 
 const LANGUAGES = [
   { code: 'en-US', name: 'English', sub: 'อังกฤษ', flag: '🇬🇧', flagImg: 'https://flagcdn.com/w80/gb.png', color: '#3b82f6' },
@@ -195,6 +215,79 @@ export default function App() {
             กรุณาเปิดบน Chrome, Edge, หรือ Firefox บนคอมพิวเตอร์
           </p>
         </div>
+      </div>
+    )
+  }
+
+  const [usageData, setUsageData] = useState(getUsageData)
+  const [remaining, setRemaining] = useState(FREE_TIER_DURATION)
+  const [showSubscription, setShowSubscription] = useState(false)
+  const [timeExpired, setTimeExpired] = useState(false)
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - usageData.startTime) / 1000)
+      const left = Math.max(0, FREE_TIER_DURATION - elapsed)
+      setRemaining(left)
+      if (left <= 0 && !usageData.isPro) {
+        setTimeExpired(true)
+      }
+    }, 1000)
+    return () => clearInterval(timer)
+  }, [usageData])
+
+  const handleSubscribe = useCallback((plan) => {
+    const newData = { ...usageData, isPro: true, plan, subscribedAt: Date.now() }
+    saveUsageData(newData)
+    setUsageData(newData)
+    setShowSubscription(false)
+    setTimeExpired(false)
+  }, [usageData])
+
+  if (timeExpired && !usageData.isPro) {
+    return (
+      <div style={{ minHeight: '100vh', background: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+        <style>{CSS}</style>
+        <div style={{
+          background: 'linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%)',
+          borderRadius: 24, padding: '40px 32px',
+          border: '1px solid rgba(255,255,255,.08)',
+          boxShadow: '0 24px 80px rgba(0,0,0,.6)',
+          textAlign: 'center', maxWidth: 420, width: '100%',
+        }}>
+          <div style={{
+            width: 72, height: 72, borderRadius: 20,
+            background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 auto 20px', boxShadow: '0 8px 32px rgba(99,102,241,.4)',
+          }}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#fff" />
+            </svg>
+          </div>
+          <h1 style={{ color: '#fff', fontSize: 26, fontWeight: 800, marginBottom: 10 }}>
+            เวลาใช้งานฟรีหมดแล้ว
+          </h1>
+          <p style={{ color: 'rgba(255,255,255,.5)', fontSize: 14, lineHeight: 1.6, marginBottom: 28 }}>
+            คุณได้ใช้งานฟรีครบ 1 ชั่วโมงแล้ว<br />
+            อัพเกรดเป็น Pro เพื่อใช้งานต่อได้ไม่จำกัด
+          </p>
+          <button onClick={() => setShowSubscription(true)}
+            style={{
+              width: '100%', padding: '14px 24px', borderRadius: 14,
+              border: 'none', cursor: 'pointer',
+              background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
+              color: '#fff', fontSize: 16, fontWeight: 700,
+              boxShadow: '0 8px 24px rgba(99,102,241,.4)',
+              transition: 'all .2s ease',
+            }}>
+            อัพเกรดเป็น Pro
+          </button>
+          <p style={{ color: 'rgba(255,255,255,.3)', fontSize: 12, marginTop: 16 }}>
+            เริ่มต้นเพียง 149 บาท/เดือน
+          </p>
+        </div>
+        {showSubscription && <SubscriptionModal onClose={() => setShowSubscription(false)} onSubscribe={handleSubscribe} />}
       </div>
     )
   }
@@ -422,6 +515,7 @@ export default function App() {
           <img src={TH_FLAG_IMG} alt="TH" style={{ width: 32, height: 24, borderRadius: 3, objectFit: 'cover' }} />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <TimerBadge remaining={remaining} isPro={usageData.isPro} onUpgrade={() => setShowSubscription(true)} />
           {activeRef.current && (
             <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: statusDotColor, fontWeight: 600 }}>
               <span style={{
@@ -484,6 +578,7 @@ export default function App() {
         ))}
         {listening && <ListeningCard lang={selectedLang} />}
       </div>
+      {showSubscription && <SubscriptionModal onClose={() => setShowSubscription(false)} onSubscribe={handleSubscribe} />}
     </div>
   )
 }
