@@ -357,7 +357,7 @@ export default function App() {
         <div style={{ padding: '80px 20px 40px', textAlign: 'center' }}>
           <div style={{ fontSize: 56, marginBottom: 16 }}>🌐</div>
           <h1 style={{ fontSize: 36, fontWeight: 800, color: '#fff', marginBottom: 8, letterSpacing: -0.5 }}>
-            Live Translator
+            Live Translator for Windows
           </h1>
           <p style={{ color: 'rgba(255,255,255,.4)', fontSize: 15, marginBottom: 56, fontWeight: 500 }}>
             เลือกภาษาที่ต้องการแปล
