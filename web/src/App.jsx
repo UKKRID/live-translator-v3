@@ -76,6 +76,10 @@ async function transcribeAudio(audioBlob, language) {
   return result.text || ''
 }
 
+function isMobileDevice() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+}
+
 const CSS = `
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0a0a0a;color:#f0f0f0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans Thai",sans-serif;overflow:hidden}
@@ -166,6 +170,35 @@ function ListeningCard({ lang }) {
 }
 
 export default function App() {
+  if (isMobileDevice()) {
+    return (
+      <div style={{ minHeight: '100vh', background: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+        <style>{CSS}</style>
+        <div style={{ textAlign: 'center', maxWidth: 400 }}>
+          <div style={{ fontSize: 64, marginBottom: 20 }}>💻</div>
+          <h1 style={{ fontSize: 28, fontWeight: 800, color: '#fff', marginBottom: 12, letterSpacing: -0.5 }}>
+            Desktop Only
+          </h1>
+          <p style={{ color: 'rgba(255,255,255,.5)', fontSize: 15, lineHeight: 1.6, marginBottom: 24 }}>
+            Live Translator ต้องใช้งานบน <strong style={{ color: '#4ade80' }}>คอมพิวเตอร์</strong> เท่านั้น
+          </p>
+          <div style={{
+            background: 'rgba(255,255,255,.05)',
+            border: '1px solid rgba(255,255,255,.1)',
+            borderRadius: 12, padding: '16px 20px', marginBottom: 20,
+          }}>
+            <p style={{ color: 'rgba(255,255,255,.6)', fontSize: 13, lineHeight: 1.6 }}>
+              สาเหตุ: ฟีเจอร์จับเสียงจาก tab/browser ({`getDisplayMedia`}) ใช้ได้บน desktop เท่านั้น
+            </p>
+          </div>
+          <p style={{ color: 'rgba(255,255,255,.3)', fontSize: 12 }}>
+            กรุณาเปิดบน Chrome, Edge, หรือ Firefox บนคอมพิวเตอร์
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   const [selectedLang, setSelectedLang] = useState(null)
   const [status, setStatus] = useState('idle')
   const [cards, setCards] = useState([])
